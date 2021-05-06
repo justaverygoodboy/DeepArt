@@ -1,5 +1,5 @@
 # DEEPART
-This is the project DEEPART's FE code. You can view it  on http://http://121.5.149.107/.
+This is the project DEEPART's FE code. You can view it  on http://121.5.149.107/.
 
 ## Project setup
 ```
