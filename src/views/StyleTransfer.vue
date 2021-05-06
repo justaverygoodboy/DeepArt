@@ -1,24 +1,31 @@
 <template>
 <div class="bg">
     <div class="func-title">赋予你的图像不同的风格</div>
-    <div class="container">
+    <div class="container-s">
       <div class="img-container">
         <p id="input-tag" style="margin-bottom: 20px;font-size:24px">输入图像</p>
         <div class="bigImg-div" v-loading="upLoading" id="upload" @click="toGetImg">
           <img class="bigImg" :src="upUrl" v-if="upUrl">
         </div>
       </div>
-      <div class="plus">
-        <svg t="1617030800255" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2038" width="78" height="78"><path d="M810.666667 469.333333h-256V213.333333c0-25.6-17.066667-42.666667-42.666667-42.666666s-42.666667 17.066667-42.666667 42.666666v256H213.333333c-25.6 0-42.666667 17.066667-42.666666 42.666667s17.066667 42.666667 42.666666 42.666667h256v256c0 25.6 17.066667 42.666667 42.666667 42.666666s42.666667-17.066667 42.666667-42.666666v-256h256c25.6 0 42.666667-17.066667 42.666666-42.666667s-17.066667-42.666667-42.666666-42.666667z" p-id="2039" fill="#8a8a8a"></path></svg>
+      <div class="styleChooser">
+        <el-dropdown @command="handleCommand">
+        <span class="el-dropdown-link">
+          选择风格<i class="el-icon-arrow-down el-icon--right"></i>
+        </span>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item v-for="(style,index) in styles" :key=index :command="style.type">{{style.type}}</el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
       </div>
       <div class="style-container">
-        <p id="input-tag" style="margin-bottom: 20px;font-size:24px">风格图像</p>
-        <div class="bigImg-div" v-loading="styleLoading" id="upload" @click="toGetStyle">
+        <p id="style-tag" style="margin-bottom: 20px;font-size:24px">风格图像</p>
+        <div class="bigImg-div" v-loading="styleLoading">
           <img class="bigImg" :src="styleUrl" v-if="styleUrl">
         </div>
       </div>
-      <div class="function-buttons">
-        <my-btn @click.native="colorization">风格迁移</my-btn>
+      <div class="func-btn">
+        <my-btn @click.native="styleTransfer" :disabled="generating">{{generate}}</my-btn>
       </div>
       <div class="img-result">
         <p id="output-tag" style="margin-bottom: 20px;font-size:24px">输出图像</p>
@@ -32,9 +39,8 @@
 </template>
 <script>
 let inputElement = null
-let styleElement = null
-import MyBtn from '../components/MyBtn.vue'
 import DownImg from '../components/DownImg'
+import MyBtn from '../components/MyBtn'
 export default {
     name:'style',
     components:{MyBtn,DownImg},
@@ -46,6 +52,19 @@ export default {
         resLoading: false,
         upLoading: false,
         styleLoading: false,
+        styles:[{"type":"candy","url":"https://i.loli.net/2021/05/02/iGCIP2jRm1E5UvD.jpg"},
+                {"type":"cubist","url":"https://i.loli.net/2021/05/02/TSfNvrgZuP2mwDs.jpg"},
+                {"type":"mosaic","url":"https://i.loli.net/2021/05/02/K3km6byhWTEP7lp.jpg"},
+                {"type":"muse","url":"https://i.loli.net/2021/05/02/6CZJiOMRYH7hlFx.jpg"},
+                {"type":"rain","url":"https://i.loli.net/2021/05/02/tm6ILMzJB5uQYHd.jpg"},
+                {"type":"scream","url":"https://i.loli.net/2021/05/02/EkfxgUN3SAbqrnV.jpg"},
+                {"type":"shipwreck","url":"https://i.loli.net/2021/05/02/AFZwQmsdUToHBIb.jpg"},
+                {"type":"starry","url":"https://i.loli.net/2021/05/02/gGsnY6FQUXyzE3h.jpg"},
+                {"type":"udnie","url":"https://i.loli.net/2021/05/02/D9IZb7FqTPWkraQ.jpg"},
+                {"type":"wave","url":"https://i.loli.net/2021/05/02/TtOqNlYm9rZUsok.jpg"}],
+        chooseStyle: '',
+        generate: '生成',
+        generating: false
       }
     },
     methods: {
@@ -63,21 +82,6 @@ export default {
           document.body.appendChild(inputElement)
           }
           inputElement.click()
-      },
-      toGetStyle() {
-        if (styleElement === null) {
-          styleElement = document.createElement('input')
-          styleElement.setAttribute('type', 'file')
-          styleElement.setAttribute('id','upStyle')
-          styleElement.style.display = 'none'
-          if (window.addEventListener) {
-            styleElement.addEventListener('change', this.uploadFile, false)
-          } else {
-            styleElement.attachEvent('onchange', this.uploadFile)
-          }
-          document.body.appendChild(styleElement)
-          }
-          styleElement.click()
       },
       uploadFile(el) {
         if (el && el.target && el.target.files && el.target.files.length > 0) {
@@ -103,24 +107,72 @@ export default {
           }
         }
       },
-      colorization() {
+      checkUser() {
+        let token = window.localStorage.getItem('token')
+        if (token === null){
+          this.$router.push({path:'/login'})
+          return
+        }
+      },
+      styleTransfer() {
+        this.checkUser()
         let img = this.upUrl
-        if (img === '') {
+        let type = this.chooseStyle
+        if (img === ''||type === '') {
           return
         }
         this.resLoading = true
+        this.generate = '生成中'
+        this.generating = true
         let _this = this
-        this.$axios.post('http://localhost:8000/style/',{
+        this.$axios.post(this.$api.funcUrl+'/style/',{
           'img': img,
+          'type': type
         }).then((res)=>{
           _this.resUrl = res.data
           _this.resLoading = false
-        }).catch((err)=>{console.log(err)})
+          _this.generate = '生成'
+          _this.generating = false
+        }).catch(()=>{
+          _this.resLoading = false
+          _this.generate = '生成'
+          _this.generating = false
+          this.$message.error('啊欧，服务器开小差去了！')})
+      },
+      handleCommand(command) {
+        for(let i=0;i<this.styles.length;i++){
+          if (this.styles[i].type === command){
+            this.styleUrl = this.styles[i].url
+            this.chooseStyle = this.styles[i].type
+            break
+          }
+        }
       }
     }
 }
 </script>
 <style scoped>
+@media screen and (max-width:816px){
+  .container-s {
+    flex-direction: column;
+    height: 100%!important;
+    margin: 0!important;
+    padding:0px!important;
+  }
+  .func-title {
+    display: none;
+  }
+  .bg {
+   height: 160vh!important; 
+  }
+  .el-dropdown-link {
+    width: 100px;
+    height: 50px;
+  }
+  .styleChooser {
+    margin:30px!important;
+  }
+}
 .bg {
   width: 100vw;
   height: 91.5vh;
@@ -128,12 +180,13 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: url('../assets/style.jpg') no-repeat;
+  background: url('https://i.loli.net/2021/05/02/aspjkoAPzdL6RM1.jpg') no-repeat;
   background-size: 100% 100%;
 }
 .func-title {
   font-size: 36px;
   letter-spacing: 5px;
+  color: #fff;
 }
 .plus {
   display: flex;
@@ -141,16 +194,34 @@ export default {
   align-items: center;
   margin: 20px;
 }
-.container {
+.container-s {
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: rgba(255, 255, 255, 0.911);
-  margin: 40px;
-  width: 1500px;
+  margin: 30px 0 0 0;
+  width: 1550px!important;
   height: 500px;
   border-radius: 20px;
   box-shadow: 2px 3px 4px #8a8a8a;
+}
+.el-dropdown-link {
+  cursor: pointer;
+  color: #fff;
+  background: #5000BE;
+  font-size: 16px;
+  padding: 16px;
+  margin: 40px;
+  width: 100px;
+  height: 50px;
+}
+.el-dropdown-menu__item {
+  color: black;
+  font-size: 18px;
+}
+.el-dropdown-menu__item:hover {
+  background: #DDD6FE!important;
+  color: black!important;
 }
 .style-container {
   margin: 0 0 0 10px;
@@ -175,10 +246,10 @@ export default {
   color: black; 
 }
 #upload,#upStyle{
-  background: url('../assets/upImgg.png') no-repeat 50% 50%;
+  background: url('https://i.loli.net/2021/05/03/zicJGHnqhvUI6Tp.png') no-repeat 50% 50%;
 }
 #upload:hover{
-  background: url('../assets/upImg.png') no-repeat 50% 50%;
+  background: url('https://i.loli.net/2021/05/03/qFwy3agTfBGrCSQ.png') no-repeat 50% 50%;
 }
 .bigImg-div:hover {
   border: 1px solid #5000BE;

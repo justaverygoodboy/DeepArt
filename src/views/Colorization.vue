@@ -1,7 +1,6 @@
 <template>
 <div class="bg">
     <div class="func-title">让你的照片彩色动人</div>
-    <!-- <loading class="loading"/> -->
     <div class="container">
       <div class="img-container">
         <p id="input-tag" style="margin-bottom: 20px;font-size:24px">输入图像</p>
@@ -10,7 +9,7 @@
         </div>
       </div>
       <div class="function-buttons">
-        <my-btn @click.native="colorization">图像彩色化</my-btn>
+        <my-btn @click.native="colorization" :disabled="generating">{{generate}}</my-btn>
       </div>
       <div class="img-result">
         <p id="output-tag" style="margin-bottom: 20px;font-size:24px">输出图像</p>
@@ -35,6 +34,8 @@ export default {
         resUrl: '',
         resLoading: false,
         upLoading: false,
+        generate:'生成',
+        generating:false
       }
     },
     methods: {
@@ -72,24 +73,57 @@ export default {
           }
         }
       },
+      checkUser() {
+        let token = window.localStorage.getItem('token')
+        if (token === null){
+          this.$router.push({path:'/login'})
+          return
+        }
+      },
       colorization() {
+        this.checkUser()
         let img = this.upUrl
         if (img === '') {
           return
         }
-        this.resLoading = true
+        this.resLoading = true  
+        this.generating = true
+        this.generate = '生成中'
         let _this = this
-        this.$axios.post('http://localhost:8000/colorization/',{
+        this.$axios.post(this.$api.funcUrl+'/colorization/',{
           'img': img,
         }).then((res)=>{
           _this.resUrl = res.data
           _this.resLoading = false
-        }).catch((err)=>{console.log(err)})
+          _this.generate = '生成'
+          _this.generating = false
+        }).catch(()=>{
+          _this.resLoading = false
+          _this.generate = '生成'
+          _this.generating = false
+          this.$message.error('啊欧，服务器开小差去了')})
       }
     }
 }
 </script>
 <style scoped>
+@media screen and (max-width:816px){
+  .container {
+    flex-direction: column;
+    height: 950px!important;
+    margin: 0!important;
+    padding:0px!important;
+  }
+  .func-title {
+    display: none;
+  }
+  .bg {
+   height: 105vh!important; 
+  }
+  .container {
+    height: 100%!important;
+  }
+}
 .bg {
   width: 100vw;
   height: 91.5vh;
@@ -97,12 +131,13 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: url('../assets/colorization.png') no-repeat;
+  background: url('https://i.loli.net/2021/05/02/Du35VTtGB6Xdilk.png') no-repeat;
   background-size: 100% 100%;
 }
 .func-title {
   font-size: 36px;
   letter-spacing: 5px;
+  color: #fff;
 }
 .container {
   display: flex;
@@ -142,10 +177,10 @@ export default {
   color: black; 
 }
 #upload,#upStyle{
-  background: url('../assets/upImgg.png') no-repeat 50% 50%;
+  background: url('https://i.loli.net/2021/05/03/zicJGHnqhvUI6Tp.png') no-repeat 50% 50%;
 }
 #upload:hover{
-  background: url('../assets/upImg.png') no-repeat 50% 50%;
+  background: url('https://i.loli.net/2021/05/03/qFwy3agTfBGrCSQ.png') no-repeat 50% 50%;
 }
 .bigImg-div:hover {
   border: 1px solid #5000BE;

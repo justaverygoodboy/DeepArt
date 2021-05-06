@@ -1,5 +1,5 @@
 <template>
-  <div class="AI-item">
+  <div class="AI-item shadow">
     <div :style="{background:'url('+bgImg+') no-repeat',backgroundSize:'100% 100%'}" class="item-pic" id="colorization">
     </div>
     <div class="item-title">
@@ -40,7 +40,6 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  box-shadow: 0 5px 15px -5px rgba(0,0,0,.5);
 }
 .item-title{
   margin: 10px 0 10px 5px;

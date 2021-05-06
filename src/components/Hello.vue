@@ -26,7 +26,6 @@ methods:{
           this.speedY = randomNum(-3, 3) * 0.2
         }
         Ball.prototype = {
-		//绘制小球
           draw: function () {
             ctx.beginPath()
             ctx.globalAlpha = 1;
@@ -34,11 +33,9 @@ methods:{
             ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2)
             ctx.fill()
           },
-		//小球移动
           move: function () {
             this.x += this.speedX
             this.y += this.speedY
-		//为了合理性,设置极限值
             if (this.x <= 3 || this.x > canvas.width - 3) {
               this.speedX *= -1
             }
@@ -47,26 +44,18 @@ methods:{
             }
           }
         };
-		//存储所有的小球
         var balls = []
-		//创建200个小球
         for (var i = 0; i < 150; i++) {
           var ball = new Ball()
           balls.push(ball)
         }
         main();
-
         function main() {
           ctx.clearRect(0, 0, canvas.width, canvas.height)
-		//鼠标移动绘制线
           mouseLine();
-		//小球与小球之间自动画线
           drawLine();
-		//使用关键帧动画，不断的绘制和清除
           window.requestAnimationFrame(main)
         }
-		//添加鼠标移动事件
-		//记录鼠标移动时的mouseX坐标
         var mouseX;
         var mouseY;
         canvas.onmousemove = function (e) {
@@ -74,8 +63,6 @@ methods:{
           mouseX = ev.offsetX;
           mouseY = ev.offsetY;
         }
-		//判断是否划线
-
         function drawLine() {
           for (var i = 0; i < balls.length; i++) {
             balls[i].draw();
@@ -94,7 +81,6 @@ methods:{
             }
           }
         }
-		//使用鼠标移动划线
         function mouseLine() {
           for (var i = 0; i < balls.length; i++) {
             if (Math.sqrt(Math.pow((balls[i].x - mouseX), 2) + Math.pow((balls[i].y - mouseY), 2)) < 80) {
@@ -107,7 +93,6 @@ methods:{
             }
           }
         }
-		//随机函数
         function randomNum(m, n) {
           return Math.floor(Math.random() * (n - m + 1) + m)
         }

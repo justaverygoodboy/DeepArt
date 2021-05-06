@@ -1,23 +1,15 @@
 <template>
+<div class="bg">
+    <div class="func-title">图像增强</div>
     <div class="container">
         <div class="img-container">
           <p id="input-tag" style="margin-bottom: 20px;font-size:24px">输入图像</p>
           <div class="bigImg-div" v-loading="upLoading" id="upload" @click="toGetImg">
             <img class="bigImg" :src="upUrl" v-if="upUrl">
           </div>
-          <div ref="styleSample" style="margin-top:20px;display:none">
-            <p id="input-tag" style="margin-bottom: 20px;font-size:24px">参考风格图像</p>
-            <div class="bigImg-div" id="upStyle" @click="toGetStyle">
-              <img class="bigImg" :src="styleUrl" v-if="styleUrl">
-            </div>
-          </div>
         </div>
         <div class="function-buttons">
-          <my-btn style="margin-top:50px" @click.native="denoise">图像去噪</my-btn>
-          <my-btn @click.native="colorization">图像彩色化</my-btn>
-          <my-btn @click.native="SR">超分辨率重建</my-btn>
-          <my-btn @click.native="comicalize">头像漫画化</my-btn>
-          <my-btn @click.native="stylify">图像风格化</my-btn>
+          <my-btn @click.native="enhance" :disabled="generating">{{generate}}</my-btn>
         </div>
         <div class="img-result">
           <p id="output-tag" style="margin-bottom: 20px;font-size:24px">输出图像</p>
@@ -27,23 +19,23 @@
           <down-img :downUrl="resUrl" :exist="resUrl"/>
         </div>
       </div>
+</div>
 </template>
 <script>
 let inputElement = null
-let styleElement = null
 import MyBtn from '../components/MyBtn.vue'
 import DownImg from '../components/DownImg'
 export default {
-    name:'Enhance',
+    name:'deblur',
     components:{MyBtn,DownImg},
     data() {
       return {
         upUrl: '',
         resUrl: '',
-        styleUrl: '',
         resLoading: false,
         upLoading: false,
-        styleLoading: false,
+        generating: false,
+        generate: '生成'
       }
     },
     methods: {
@@ -61,21 +53,6 @@ export default {
           document.body.appendChild(inputElement)
           }
           inputElement.click()
-      },
-      toGetStyle() {
-        if (styleElement === null) {
-          styleElement = document.createElement('input')
-          styleElement.setAttribute('type', 'file')
-          styleElement.setAttribute('id','upStyle')
-          styleElement.style.display = 'none'
-          if (window.addEventListener) {
-            styleElement.addEventListener('change', this.uploadFile, false)
-          } else {
-            styleElement.attachEvent('onchange', this.uploadFile)
-          }
-          document.body.appendChild(styleElement)
-          }
-          styleElement.click()
       },
       uploadFile(el) {
         if (el && el.target && el.target.files && el.target.files.length > 0) {
@@ -101,89 +78,78 @@ export default {
           }
         }
       },
-      denoise() {
-        let img = this.upUrl
-        if (img === '') {
+      checkUser() {
+        let token = window.localStorage.getItem('token')
+        if (token === null){
+          this.$router.push({path:'/login'})
           return
         }
-        this.loading = true
-        let _this = this
-        this.$axios.post('http://localhost:8000/comicalize/',{
-          'img': img,
-        }).then((res)=>{
-          _this.resUrl = res.data
-          _this.loading = false
-        }).catch((err)=>{console.log(err)})
       },
-      comicalize() {
+      enhance() {
+        this.checkUser()
         let img = this.upUrl
         if (img === '') {
           return
         }
-        this.loading = true
+        this.resLoading = true
+        this.generating = true
+        this.generate = '生成中'
         let _this = this
-        this.$axios.post('http://localhost:8000/comicalize/',{
+        this.$axios.post(this.$api.funcUrl+'/enhance/',{
           'img': img,
         }).then((res)=>{
           _this.resUrl = res.data
-          _this.loading = false
-        }).catch((err)=>{console.log(err)})
-      },
-      stylify() {
-        let stylify = this.$refs.styleSample
-        stylify.style.display = ""
-        stylify.style.position = "absolute"
-        let img = this.upUrl
-        if (img === '') {
-          return
-        }
-        this.loading = true
-        let _this = this
-        this.$axios.post('http://localhost:8000/stylify/',{
-          'img': img,
-        }).then((res)=>{
-          _this.resUrl = res.data
-          _this.loading = false
-        }).catch((err)=>{console.log(err)})
-      },
-      SR() {
-        let img = this.upUrl
-        if (img === '') {
-          return
-        }
-        this.loading = true
-        let _this = this
-        this.$axios.post('http://localhost:8000/sr/',{
-          'img': img,
-        }).then((res)=>{
-          _this.resUrl = res.data
-          _this.loading = false
-        }).catch((err)=>{console.log(err)})
-      },
-      colorization() {
-        let img = this.upUrl
-        if (img === '') {
-          return
-        }
-        this.loading = true
-        let _this = this
-        this.$axios.post('http://localhost:8000/colorization/',{
-          'img': img,
-        }).then((res)=>{
-          _this.resUrl = res.data
-          _this.loading = false
-        }).catch((err)=>{console.log(err)})
+          _this.resLoading = false
+          _this.generating = false
+          _this.generate = '生成'
+        }).catch(()=>{
+          _this.resLoading = false
+          _this.generate = '生成'
+          _this.generating = false
+          this.$message.error('啊欧，服务器开小差去了！或者检查下是否上传有误')})
       }
     }
 }
 </script>
 <style scoped>
+@media screen and (max-width:816px){
+  .container {
+    flex-direction: column;
+    height: 950px!important;
+    margin: 0!important;
+    padding:0px!important;
+  }
+  .func-title {
+    display: none;
+  }
+  .bg {
+   height: 105vh!important; 
+  }
+  .container {
+    height: 100%!important;
+  }
+}
+.bg {
+  width: 100vw;
+  height: 91.5vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: url('https://i.loli.net/2021/05/02/IZMibYJzRrdTN4t.jpg') no-repeat;
+  background-size: 100% 100%;
+}
+.func-title {
+  font-size: 36px;
+  letter-spacing: 5px;
+  color:#fff;
+}
 .container {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: white;
-  margin: 10px;
+  background-color: rgba(255, 255, 255, 0.911);
+  margin: 40px;
   width: 950px;
   height: 500px;
   border-radius: 20px;
@@ -199,17 +165,21 @@ export default {
 .bigImg-div {
   width: 300px;
   height: 300px;
-  border: 1px solid #ddd;
+  border: 1px solid #bfbfbf;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+
+}
+#input-tag,#output-tag {
+  color: black; 
 }
 #upload,#upStyle{
-  background: url('../assets/upload.svg') no-repeat 50% 50%;
+  background: url('https://i.loli.net/2021/05/03/zicJGHnqhvUI6Tp.png') no-repeat 50% 50%;
 }
-#upload:hover,#upStyle:hover {
-  background: url('../assets/uploadActive.svg') no-repeat 50% 50%;
+#upload:hover{
+  background: url('https://i.loli.net/2021/05/03/qFwy3agTfBGrCSQ.png') no-repeat 50% 50%;
 }
 .bigImg-div:hover {
   border: 1px solid #5000BE;

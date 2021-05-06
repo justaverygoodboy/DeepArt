@@ -16,25 +16,24 @@
 </template>
 
 <script>
-
 import Card from '../components/Card'
 export default {
   name: 'Main',
   components: {Card},
   data() {
       return {
-        titles:['AI彩色化','头像漫画化','超分辨率重建','图像风格迁移','AI图像增强'],
-        briefs:['我们通过深度学习技术实现全自动的图像彩色化',
-        '将你的头像转化成漫画风！',
+        titles:['AI彩色化','头像卡通化','超分辨率重建','图像风格迁移','图像增强'],
+        briefs:['我们通过深度学习技术实现全自动的图像彩色化，让您的老照片充满色彩',
+        '将你的头像转化成漫画风！通过深度学习技术体验有趣的漫画头像！',
         '将模糊的照片进行超分辨率重建',
-        '想让你的照片充满艺术气息吗？',
-        '通过AI将照片进行智能图像增强'],
-        links:['colorization','comics','sr','style','deblur'],
-        bgImgs: [require('../assets/car.png'),
-                require('../assets/comicprofile.jpg'),
-                require('../assets/godness.jpg'),
-                require('../assets/styleprofile.jpg'),
-                require('../assets/enhance.jpg')],
+        '想让你的照片充满艺术气息吗？这将赋予你大师的笔触！',
+        '对图片进行智能图像增强'],
+        links:['colorization','comics','sr','style','enhance'],
+        bgImgs: ['https://i.loli.net/2021/05/02/AIE69TJiPs5zgaK.png',
+                'https://i.loli.net/2021/05/04/7PizytJxApRvBCD.jpg',
+                'https://i.loli.net/2021/05/02/PE7WNdeYqMkF6AT.jpg',
+                'https://i.loli.net/2021/05/02/sUGVrmP8MtD3O5p.jpg',
+                'https://i.loli.net/2021/05/02/R3nEhkALbVI5MXZ.jpg'],
       }
     },
     methods: {
@@ -42,6 +41,14 @@ export default {
   }
 </script>
 <style scoped>
+@media screen and (max-width: 600px) {
+  .topics {
+    display: none !important;
+  }
+  .AIproc {
+    flex-direction: column !important;
+  }
+}
 .main {
   display: flex;
   flex-direction: column;
@@ -59,12 +66,15 @@ export default {
   font-size: 1.1rem;
   letter-spacing: 1px;
   text-shadow: 1px 1px 3px #d8d8d8;
+  user-select:none;
+  color: #fff;
 }
 .banner {
   font-size: 2.5rem;
   letter-spacing: -0.1px;
   line-height: 1.4;
   text-shadow: 1px 1px 3px #d8d8d8;
+  color: #fff;
 }
 .AIproc {
   display: flex;

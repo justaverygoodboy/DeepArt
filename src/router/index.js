@@ -1,21 +1,25 @@
 import Router from 'vue-router'
 import Vue from 'vue'
-import Login from "../views/Login"
-import Main from "../views/Main"
-import colorization from '../views/Colorization'
-import Comics from '../views/Comics'
-import Style from '../views/StyleTransfer'
-import SR from '../views/SR'
-import Deblur from '../views/Deblur'
+const Main = () => import('../views/Main')
+const Login = () => import('../views/Login')
+const Colorization = () => import('../views/Colorization')
+const Comics = () => import('../views/Comics')
+const StyleTransfer = () => import('../views/StyleTransfer')
+const SR = () => import('../views/SR')
+const Enhance = () => import('../views/Enhance')
 Vue.use(Router)
-
 export default new Router({
     mode: 'history',
     routes: [
     {
         path: '/',
-        name: 'main',
-        component: Main
+        redirect: '/home',
+        name: '主页',
+    },
+    {
+      path: '/home',
+      name: 'home',
+      component: Main
     },
     {
       path: '/login',
@@ -25,7 +29,7 @@ export default new Router({
     {
       path: '/colorization',
       name: 'colorization',
-      component: colorization
+      component: Colorization
     },
     {
       path: '/comics',
@@ -35,7 +39,7 @@ export default new Router({
     {
       path: '/style',
       name: 'style',
-      component: Style
+      component: StyleTransfer
     },
     {
       path: '/sr',
@@ -43,9 +47,9 @@ export default new Router({
       component: SR
     },
     {
-      path: '/deblur',
-      name: 'deblur',
-      component: Deblur
+      path: '/enhance',
+      name: 'enhance',
+      component: Enhance
     },
   ]
 })

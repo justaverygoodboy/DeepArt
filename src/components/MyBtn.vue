@@ -1,10 +1,11 @@
 <template>
-  <button><slot></slot></button>
+  <button :disabled="disabled"><slot></slot></button>
 </template>
 
 <script>
 export default {
     name: 'MyBtn',
+    props: ['disabled']
 }
 </script>
 
@@ -25,6 +26,6 @@ button:hover {
   color: #5000BE;
   font-weight: 700;
   border: 1px solid #5000BE;
-  transition: all 0.2s
+  transition: all 0.15s
 }
 </style>
