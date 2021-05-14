@@ -36,12 +36,10 @@ export default {
                 'https://i.loli.net/2021/05/02/R3nEhkALbVI5MXZ.jpg'],
       }
     },
-    methods: {
-    },
   }
 </script>
 <style scoped>
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 1350px) {
   .topics {
     display: none !important;
   }

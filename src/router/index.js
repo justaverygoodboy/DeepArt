@@ -2,6 +2,7 @@ import Router from 'vue-router'
 import Vue from 'vue'
 const Main = () => import('../views/Main')
 const Login = () => import('../views/Login')
+const Profile = () => import('../views/Profile')
 const Colorization = () => import('../views/Colorization')
 const Comics = () => import('../views/Comics')
 const StyleTransfer = () => import('../views/StyleTransfer')
@@ -20,6 +21,11 @@ export default new Router({
       path: '/home',
       name: 'home',
       component: Main
+    },
+    {
+      path:'/profile',
+      name: 'profile',
+      component: Profile
     },
     {
       path: '/login',

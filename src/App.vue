@@ -15,7 +15,7 @@ export default {
 </script>
 
 <style>
-@media screen and (max-width:600px) {
+@media screen and (max-width:1350px) {
   #app {
     height: auto !important;
     background-size:cover!important; 
@@ -31,9 +31,9 @@ export default {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: url('https://i.loli.net/2021/05/02/lcfKIVxuaBb2ENe.jpg') no-repeat 50%;
+  background: url('https://i.loli.net/2021/05/02/lcfKIVxuaBb2ENe.jpg') no-repeat 30%;
   height: 100vh;
-  overflow: hidden;
+  background-size: cover;
 }
 .content {
   display: flex;
